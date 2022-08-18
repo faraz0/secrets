@@ -4,7 +4,9 @@ const app = express();
 const bp = require("body-parser");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
-var encrypt = require('mongoose-encryption');
+const encrypt = require('mongoose-encryption');
+const md5 = require('md5');
+
 
 app.use(bp.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
@@ -16,7 +18,6 @@ const userSchema = new mongoose.Schema({
   usr: String,
   pwd: String
 });
-
 //Encryption plugin
 userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['pwd'] });
 //Model DB
@@ -53,7 +54,7 @@ app.post("/register", function(req,res){
       else{
         const newUser = new User({
           usr: req.body.username,
-          pwd: req.body.password
+          pwd: md5(req.body.password)
         }).save(function(err){
           if(err) console.log(err);
           else console.log("New User added successfully");
@@ -68,7 +69,7 @@ app.post("/register", function(req,res){
 app.post("/login", function(req,res){
   User.findOne({usr:req.body.username}, function(err, user){
     if(!err){
-      if(user.pwd===req.body.password){
+      if(user.pwd===md5(req.body.password)){
         res.render("secrets");
         app.get("/submit", function(req, res){
           res.render("submit");
