@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   usr: String,
   pwd: String
 });
+
 //Encryption plugin
 userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ['pwd'] });
 //Model DB
